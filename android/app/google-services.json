@@ -1,0 +1,54 @@
+{
+  "project_info": {
+    "project_number": "883850492474",
+    "project_id": "capstone-35a6c",
+    "storage_bucket": "capstone-35a6c.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:883850492474:android:a6c326faa0bf6524055303",
+        "android_client_info": {
+          "package_name": "com.rr.receipt_reader"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "883850492474-1fgrq60ilsmdltans58konstj0k887up.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.rr.receipt_reader",
+            "certificate_hash": "920c7802ccc229c89c1411172b3a3f148e975d59"
+          }
+        },
+        {
+          "client_id": "883850492474-mnj73h6jbhhn9hi1lpq1ct3s60oisf24.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC0jFQxlmrNPqnS_0-fHn3f6kN6TGJnozY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "883850492474-mnj73h6jbhhn9hi1lpq1ct3s60oisf24.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "883850492474-3sagf0ad0m5ee5v32a52g0vqc856s10j.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.rr.receiptReader"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

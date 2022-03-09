@@ -1,10 +1,15 @@
+import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
-import 'home_page.dart';
-import 'add_receipt.dart';
-import 'ledger.dart';
-import 'settings.dart';
+import 'package:receipt_reader/home_page.dart';
+import 'package:receipt_reader/add_receipt.dart';
+import 'package:receipt_reader/ledger.dart';
+import 'package:receipt_reader/settings.dart';
+import 'package:receipt_reader/storage.dart';
 
-void main() {
+List<CameraDescription>? cameras;
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  cameras = await availableCameras();
   runApp(const MyApp());
 }
 
@@ -16,6 +21,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Receipt Reader',
+      debugShowCheckedModeBanner: false,
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
@@ -39,8 +45,8 @@ class _MyHomePageState extends State<MyHomePage> {
 
   final List<Widget> _widgetOptions = <Widget>[
       const HomePage(),
-      const AddReceipt(),
-      const Ledger(),
+      AddReceipt(camera: cameras!.first, storage: FormStorage()),
+      Ledger(storage: FormStorage()),
       const Settings(),
   ];
 

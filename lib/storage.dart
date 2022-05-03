@@ -1,9 +1,10 @@
 import 'dart:async';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:receipt_reader/firebase_config.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:receipt_reader/firebase_config.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:uuid/uuid.dart';
 
-class FormStorage {
+class Storage {
   bool _initialized = false;
 
   Future<void> initializeDefault() async {
@@ -12,36 +13,59 @@ class FormStorage {
     _initialized = true;
   }
 
-  FormStorage() {
+  Storage() {
     initializeDefault();
   }
 
-  Future<bool> write(String collection, String doc, String key, String name) async {
+  Future<bool> write(String collection, String doc, Map<String, dynamic> data) async {
     if (!_initialized) {
       await initializeDefault();
     }
     FirebaseFirestore firestore = FirebaseFirestore.instance;
-    firestore
-      .collection(collection)
-      .doc(doc)
-      .set({
-          key: name,
-      })
-      .then((value) => print("Data Added"))
-      .catchError((error) => print("Failed to update: $error"));
+    String key = const Uuid().v1().toString();
+
+    var checkDoc = await firestore.collection(collection).doc(doc).get();
+    if (checkDoc.exists) {
+      firestore
+        .collection(collection)
+        .doc(doc)
+        .update({
+            key: data,
+        })
+        .then((value) => print("Data Added"))
+        .catchError((error) => print("Failed to update: $error"));
+    }
+    else {
+      firestore
+        .collection(collection)
+        .doc(doc)
+        .set({
+            key: data,
+        })
+        .then((value) => print("Data Added"))
+        .catchError((error) => print("Failed to update: $error"));
+    }
+
     return true;
   }
 
-  Future<String> read(String collection, String doc, String key) async {
+  Future<Map<String, dynamic>> read(String collection, String doc) async {
     if (!_initialized) {
       await initializeDefault();
     }
+    Map<String, dynamic> data;
     FirebaseFirestore firestore = FirebaseFirestore.instance;
     DocumentSnapshot value =
       await firestore
         .collection(collection)
-        .doc(doc).get();
-    Map<String, dynamic>? data = (value.data()) as Map<String, dynamic>?;
-    return data![key];
+        .doc(doc)
+        .get();
+    if (value.data() == null) {
+      data = {};
+    }
+    else {
+      data = (value.data()) as Map<String, dynamic>;
+    }
+    return data;
   }
 }

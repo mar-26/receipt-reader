@@ -1,15 +1,19 @@
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
-import 'package:receipt_reader/home_page.dart';
-import 'package:receipt_reader/add_receipt.dart';
-import 'package:receipt_reader/ledger.dart';
-import 'package:receipt_reader/settings.dart';
 import 'package:receipt_reader/storage.dart';
+import 'package:receipt_reader/receipts.dart';
+import 'package:receipt_reader/settings.dart';
+import 'package:receipt_reader/home_page.dart';
+import 'package:receipt_reader/login_page.dart';
+import 'package:receipt_reader/add_receipt.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 
 List<CameraDescription>? cameras;
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   cameras = await availableCameras();
+  await Firebase.initializeApp();
   runApp(const MyApp());
 }
 
@@ -26,6 +30,9 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.blue,
       ),
       home: const MyHomePage(title: 'Receipt Reader'),
+      routes: <String, WidgetBuilder> {
+        "login" : (BuildContext context) => const LoginPage(),
+      }
     );
   }
 }
@@ -45,10 +52,26 @@ class _MyHomePageState extends State<MyHomePage> {
 
   final List<Widget> _widgetOptions = <Widget>[
       const HomePage(),
-      AddReceipt(camera: cameras!.first, storage: FormStorage()),
-      Ledger(storage: FormStorage()),
+      AddReceipt(camera: cameras!.first, storage: Storage()),
+      Receipts(storage: Storage()),
       const Settings(),
   ];
+
+  @override
+  void initState() {
+    super.initState();
+    FirebaseAuth.instance
+      .userChanges()
+      .listen((User? user) {
+        if (user == null) {
+          Future(() {
+            Navigator.of(context).pushNamed('login');
+          });
+        } else {
+          print('User is signed in!');
+        }
+    });
+  }
 
   void _onItemTap(int index) {
     setState(() {
@@ -76,7 +99,7 @@ class _MyHomePageState extends State<MyHomePage> {
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.account_balance),
-            label: 'Ledger',
+            label: 'Receipts',
             backgroundColor: Colors.blue,
           ),
           BottomNavigationBarItem(

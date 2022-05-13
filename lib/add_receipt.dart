@@ -1,4 +1,3 @@
-import 'package:uuid/uuid.dart';
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:receipt_reader/storage.dart';
@@ -22,8 +21,9 @@ class _AddReceiptState extends State<AddReceipt> {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false, home: Center(
+    return Scaffold(
+      backgroundColor: const Color(0xffdfdfdc),
+      body: Center(
         child: Column(
           children: <Widget>[
             const Padding(
@@ -33,6 +33,9 @@ class _AddReceiptState extends State<AddReceipt> {
               ),
             ),
             ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                primary: Colors.blue,
+              ),
               child: const Text("Take Picture"),
               onPressed: () async {
                 _imagePath = (await _picker.pickImage(source: ImageSource.camera))!.path;
@@ -43,6 +46,9 @@ class _AddReceiptState extends State<AddReceipt> {
               },
             ),
             ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                primary: Colors.blue,
+              ),
               child: const Text("Gallery"),
               onPressed: () async {
                 _imagePath = (await _picker.pickImage(source: ImageSource.gallery))!.path;
@@ -81,7 +87,7 @@ class _ReviewState extends State<Review> {
     var amountRegex = RegExp(r"^\d*\.\d*");
     List<dynamic> amountList = [];
 
-    final textDetector = GoogleMlKit.vision.textDetectorV2();
+    final textDetector = GoogleMlKit.vision.textDetector();
 
     final RecognisedText recognisedText = await textDetector.processImage(InputImage.fromFilePath(widget.imagePath));
 
@@ -95,12 +101,16 @@ class _ReviewState extends State<Review> {
           if (dateRegex.firstMatch(element.text) != null) {
             data["date"] = element.text;
           }
+          else {
+            data["date"] = "";
+          }
           if (amountRegex.firstMatch(element.text) != null) {
             amountList.add(element.text);
           }
         }
       }
     }
+
     // GET RECEIPT TOTAL
     double max = 0.0;
     for (var s in amountList) {
@@ -110,6 +120,7 @@ class _ReviewState extends State<Review> {
         }
       }
     }
+    print("MAX = $max");
     data["total"] = max;
 
     amountList.clear();
@@ -125,6 +136,7 @@ class _ReviewState extends State<Review> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: const Color(0xffdfdfdc),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -133,10 +145,10 @@ class _ReviewState extends State<Review> {
               future: processImage(),
               builder: (context, snapshot) {
                 if (snapshot.hasData && snapshot.connectionState == ConnectionState.done) {
-                  return Card(
+                  return SafeArea(
                     child: Column(
                       children: <Widget>[
-                        const Text("Does the information look correct?", style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold)),
+                        const Text("Does this information look correct?", style: TextStyle(fontSize: 23, fontWeight: FontWeight.bold)),
                         Padding(
                           padding: const EdgeInsets.only(top:25.0),
                           child: TextFormField(
@@ -158,6 +170,30 @@ class _ReviewState extends State<Review> {
                             controller: totalController,
                           ),
                         ),
+                        ElevatedButton(
+                          child: const Text("Save"),
+                          onPressed: () {
+                            data.update("place", (value) => placeController.text);
+                            data.update("date", (value) => dateController.text);
+                            data.update("total", (value) => totalController.text);
+            //  DEBUG
+            //                print("!!MAP!!");
+            //                for (String k in data.keys) {
+            //                  print(data[k]);
+            //                }
+            
+                            widget.storage.write("users", FirebaseAuth.instance.currentUser!.uid, data);
+                            Navigator.pop(context);
+                            ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text("Receipt Added")));
+                          },
+                        ),
+                        ElevatedButton(
+                          child: const Text("Cancel"),
+                          onPressed: () {
+                            Navigator.pop(context);
+                          },
+                        ),
                       ],
                     ),
                   );
@@ -165,34 +201,12 @@ class _ReviewState extends State<Review> {
                 else {
                   return Column(
                     children: const <Widget>[
-                      Text("Please wait a moment while we process your image."),
+                      Text("Please wait a moment while we process your image.", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                       CircularProgressIndicator()
                     ],
                   );
                 }
               }
-            ),
-            ElevatedButton(
-              child: const Text("Save"),
-              onPressed: () {
-                data.update("place", (value) => placeController.text);
-                data.update("date", (value) => dateController.text);
-                data.update("total", (value) => totalController.text);
-//  DEBUG
-//                print("!!MAP!!");
-//                for (String k in data.keys) {
-//                  print(data[k]);
-//                }
-
-                widget.storage.write("users", FirebaseAuth.instance.currentUser!.uid, data);
-                Navigator.pop(context);
-              },
-            ),
-            ElevatedButton(
-              child: const Text("Cancel"),
-              onPressed: () {
-                Navigator.pop(context);
-              },
             ),
           ],
         ),

@@ -13,19 +13,33 @@ class _LoginPageState extends State<LoginPage> {
   final _passKey = GlobalKey<FormState>();
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
+  static const Color textColor = Colors.black;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold (
+      appBar: AppBar(
+        title: const Text("Receipt Reader"),
+        automaticallyImplyLeading: false,
+      ),
+      backgroundColor: const Color(0xffdfdfdc),
       body: Form(
         key: _passKey,
         child: Center(
           child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
-              const Text("Login", style: TextStyle(fontSize: 30)),
-              TextFormField(
+              const Text("Login", style: TextStyle(color: textColor, fontSize: 30)),
+              Padding(
+                padding: const EdgeInsets.only(top: 10, left: 10, right: 10, bottom: 4),
+                child: TextFormField(
                 controller: emailController,
-                decoration: const InputDecoration(hintText: "Email"),
+                decoration: const InputDecoration(
+                  enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: textColor)),
+                  border: OutlineInputBorder(),
+                  hintText: "Email",
+                  hintStyle: TextStyle(color: textColor)
+                ),
                 validator: (value) {
                   if (value != null) {
                     return null;
@@ -35,19 +49,28 @@ class _LoginPageState extends State<LoginPage> {
                   }
                 },
               ),
-              TextFormField(
-               controller: passwordController,
-               obscureText: true, 
-               decoration: const InputDecoration(hintText: "Password"),
-               validator: (value) {
-                 if (value != null) {
-                   return null;
-                 }
-                 else {
-                   return "Password has no text";
-                 }
-               },
-             ),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(left: 10, right: 10),
+                child: TextFormField(
+                controller: passwordController,
+                obscureText: true,
+                decoration: const InputDecoration(
+                  enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: textColor)),
+                  border: OutlineInputBorder(),
+                  hintText: "Password",
+                  hintStyle: TextStyle(color: textColor)
+                ),
+                validator: (value) {
+                  if (value != null) {
+                    return null;
+                  }
+                  else {
+                    return "Password has no text";
+                  }
+                },
+              ),
+              ),
              Row(
                mainAxisAlignment: MainAxisAlignment.spaceAround,
                children: <Widget>[
@@ -60,7 +83,8 @@ class _LoginPageState extends State<LoginPage> {
                             email: emailController.text,
                             password: passwordController.text
                           );
-                          Navigator.pop(context);
+
+                            Navigator.restorablePushReplacementNamed(context, "home");
                         }
                         on FirebaseAuthException catch (e) {
                           print(e);
@@ -83,7 +107,7 @@ class _LoginPageState extends State<LoginPage> {
                ],
              ),
            ],
-         ),
+          )
        ),
       ),
     );

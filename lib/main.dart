@@ -12,7 +12,12 @@ import 'package:firebase_core/firebase_core.dart';
 List<CameraDescription>? cameras;
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  cameras = await availableCameras();
+  try {
+    cameras = await availableCameras();
+  }
+  catch (e) {
+    print(e);
+  }
   await Firebase.initializeApp();
   runApp(const MyApp());
 }
@@ -32,6 +37,7 @@ class MyApp extends StatelessWidget {
       home: const MyHomePage(title: 'Receipt Reader'),
       routes: <String, WidgetBuilder> {
         "login" : (BuildContext context) => const LoginPage(),
+        "home" : (BuildContext context) => const MyHomePage(title: "Receipt Reader"),
       }
     );
   }
@@ -51,7 +57,7 @@ class _MyHomePageState extends State<MyHomePage> {
   int _selectedIndex = 0;
 
   final List<Widget> _widgetOptions = <Widget>[
-      const HomePage(),
+      HomePage(storage: Storage()),
       AddReceipt(camera: cameras!.first, storage: Storage()),
       Receipts(storage: Storage()),
       const Settings(),
@@ -81,6 +87,10 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
+    if (FirebaseAuth.instance.currentUser == null) {
+      return const LoginPage();
+    }
+    else {
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.title),
@@ -114,5 +124,6 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
       body: _widgetOptions.elementAt(_selectedIndex),
     );
+  }
   }
 }

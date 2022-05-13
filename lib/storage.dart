@@ -1,8 +1,9 @@
 import 'dart:async';
+import 'package:uuid/uuid.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:receipt_reader/firebase_config.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:uuid/uuid.dart';
 
 class Storage {
   bool _initialized = false;
@@ -49,7 +50,7 @@ class Storage {
     return true;
   }
 
-  Future<Map<String, dynamic>> read(String collection, String doc) async {
+  Future<Map<String, dynamic>> read() async {
     if (!_initialized) {
       await initializeDefault();
     }
@@ -57,8 +58,8 @@ class Storage {
     FirebaseFirestore firestore = FirebaseFirestore.instance;
     DocumentSnapshot value =
       await firestore
-        .collection(collection)
-        .doc(doc)
+        .collection("users")
+        .doc(FirebaseAuth.instance.currentUser!.uid)
         .get();
     if (value.data() == null) {
       data = {};

@@ -12,6 +12,7 @@ class _SettingsState extends State<Settings> {
   @override
   Widget build(BuildContext context) {
       return Scaffold(
+        backgroundColor: const Color(0xffdfdfdc),
           body: Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,

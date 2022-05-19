@@ -89,7 +89,9 @@ class _LoginPageState extends State<LoginPage> {
                         on FirebaseAuthException catch (e) {
                           print(e);
                           ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text("User not found. Please try again or sign up")),
+                            const SnackBar(
+                              content: Text("Something went wrong. Please try again or sign up"),
+                            ),
                           );
                         }
                      }

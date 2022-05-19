@@ -100,9 +100,7 @@ class _ReviewState extends State<Review> {
           // GET DATE
           if (dateRegex.firstMatch(element.text) != null) {
             data["date"] = element.text;
-          }
-          else {
-            data["date"] = "";
+            print(data["date"].toString());
           }
           if (amountRegex.firstMatch(element.text) != null) {
             amountList.add(element.text);
